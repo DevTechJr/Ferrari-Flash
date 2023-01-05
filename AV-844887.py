@@ -27,6 +27,7 @@ def checkInput():
     global wrongCount # Number of Wrong Attempts
     global totalCount # Number of Total Attempts
     global systemLog # System Message Log Interface
+    global numOfQuestions
 
     boolNegativeNums = inclNegativeNums.get() # Reassign boolNegativeNums value based on User Input
     boolModulus = inclModulus.get() # Reassign boolModulus value based on User Input
@@ -36,21 +37,22 @@ def checkInput():
         systemLog.config(text="Invalid Level Selected! Try Again!")
     else:
         try:
+            numOfQuestions = int(maxNumSelection.get())
             # Further validate input
             if levelSelection == "Level 1 (1-3)":
-                frame1.config(bg="green") # Change frame background
+                questionDisplay.config(bg="green",fg="white") # Change frame background
                 maxNum = 3 # Reassign maximum number value
             elif levelSelection == "Level 2 (1-6)":
-                frame1.config(bg="yellow") # Change frame background
+                questionDisplay.config(bg="yellow") # Change frame background
                 maxNum = 6 # Reassign maximum number value
             elif levelSelection == "Level 3 (1-9)":
-                frame1.config(bg="orange") # Change frame background
+                questionDisplay.config(bg="orange") # Change frame background
                 maxNum = 9 # Reassign maximum number value
             elif levelSelection == "Level 4 (1-12)":
-                frame1.config(bg="red") # Change frame background
-                maxNum = 12 # Reassign maximum number value
-            systemLog.config(text="(System Log Messages)") # Reset System Log
-
+                questionDisplay.config(bg="red",fg="white") # Change frame background
+                maxNum = 12 # Reassign maximum number value     
+            systemLog.config(text="Game has started!") # Reset System Log to start
+            pastQuestion.config(text="")
             # Reset All Game Counter Values
             totalCount = 0
             correctCount = 0
@@ -59,10 +61,10 @@ def checkInput():
             numCorrect_value.config(text=correctCount)
             numTotal_value.config(text=totalCount)
             numWrong_value.config(text=wrongCount)
-            systemLog.config(text="Game has started!") # Game has started message
+            # Game has started message
             gen_question() # Invoke gen_question function to initially start
         except:
-            systemLog.config(text="Error in validating input! Try Again!")
+            systemLog.config(text="Improper input! Enter an integer for number of questions!")
 
 def gen_question():
     # Import Global Variables
@@ -108,6 +110,11 @@ def resetValue():
     global totalCount
     global systemLog
     global pastQuestion
+    global gameOver
+
+    # Past Game Counters
+    totalCount_old = totalCount
+    correctCount_old = correctCount
 
     # Reset Game Counters
     totalCount = 0
@@ -120,7 +127,7 @@ def resetValue():
     numWrong_value.config(text=wrongCount)
 
     # Reset frame 1 background color
-    frame1.config(bg="blue")
+    frame1.config(bg="#5F2423")
 
     # Reset question display
     questionDisplay.config(text="")
@@ -129,10 +136,25 @@ def resetValue():
     questionInput.delete(0, 'end')
 
     # Log game reset message
-    systemLog.config(text="Game has been reset")
+    if gameOver:
+        scoreStr = f"Game Over! Click Start Game to play again!"
+        systemLog.config(text=scoreStr)
 
-    # Reset past question
-    pastQuestion.config(text="")
+        try:
+            score = (correctCount_old/totalCount_old)*100
+            score = round(score,2)
+        except:
+            score = 0.00
+
+        percentStr = f"You scored a {score}%"
+        pastQuestion.config(text=percentStr)
+    else:
+        systemLog.config(text="Game has been reset")
+        pastQuestion.config(text="")
+        # Reset past question
+    
+
+    
 
 def updateScore():
     # Import Global Variables
@@ -151,6 +173,9 @@ def checkAnswer():
     global wrongCount
     global totalCount
     global pastQuestion
+    global numOfQuestions
+    global systemLog
+    global gameOver
 
     # Try to get user given answer
     try:
@@ -185,7 +210,12 @@ def checkAnswer():
     questionInput.delete(0, 'end')
 
     # Generate next question
-    gen_question()
+    if totalCount < numOfQuestions:
+        gen_question()
+    else:
+        systemLog.config(text="Game is over! Play again!")
+        gameOver = True
+        resetValue()
 
 # Define global variables
 num1 = 0 # Random number 1
@@ -198,6 +228,8 @@ maxNum = 0 # Maximum possible value for random number
 leastNum = 1 # Least possible value for random number
 boolNegativeNums = False # Boolean value for negative numbers
 boolModulus = False # Boolean value for modulus
+numOfQuestions = 0
+gameOver = False
 
 correctCount = 0 # Number of correct attempts
 wrongCount = 0 # Number of wrong attempts
@@ -205,12 +237,12 @@ totalCount = 0 # Number of total attempts
 
 # Create Tkinter Window
 window = tk.Tk()
-window.title("Mario Math Time!")
-window.geometry("640x290")
+window.title("Ferrari Flash™ - Math Game")
+# window.geometry("645x290")
 
 # Define 2 sides of app
 frame1 = tk.Frame(window) # App left side
-frame1.config(bg="blue")
+frame1.config(bg="#5F2423")
 frame1.grid(row=0, column=0,sticky="ns")
 
 frame2 = tk.Frame(window) # App right side
@@ -220,7 +252,8 @@ frame2.grid(row=0, column=1,sticky="ns")
 # Frame 2 Components
 
 # App heading
-appLabel = tk.Label(frame2, text="MARIO MATH TIME")
+appLabel = tk.Label(frame2, text="Ferrari Flash™ - Math Game",font = "Helvetica 16 bold italic", fg = "white",
+		 bg = "red",)
 appLabel.grid(column=0, row=0, padx=6, pady=6)
 
 # App options
@@ -232,37 +265,42 @@ inclNegativeNums = BooleanVar()
 inclModulus = BooleanVar()
 
 # Negative Number Checkbox
-checkNegativeNums = Checkbutton(optionsFrame, text = "Include Negative Numbers",variable=inclNegativeNums)
+checkNegativeNums = Checkbutton(optionsFrame, text = "Include Negative Numbers",variable=inclNegativeNums,font = "Helvetica 11 bold italic",selectcolor="#F7D31D")
 checkNegativeNums.grid(column=0,row=1,sticky = "NESW")
 
 # Modulus Button Checkbox
-checkModulus = Checkbutton(optionsFrame, text = "Include Modulus Operator",variable=inclModulus)
+checkModulus = Checkbutton(optionsFrame, text = "Include Modulus Operator",font = "Helvetica 11 bold italic",variable=inclModulus,selectcolor="#F7D31D")
 checkModulus.grid(column=0,row=2)
 
 # Create Combobox for level selection
-combo_label = Label(optionsFrame, text="Pick A Level :")
-combo_label.grid(column=0,row=3,sticky = "w" )
-combo = ttk.Combobox(optionsFrame)
+combo_label = Label(optionsFrame, text="Pick A Level :",font = "Helvetica 11 bold italic", fg="#BD0000")
+combo_label.grid(column=0,row=3,sticky = "ew",pady=5 )
+combo = ttk.Combobox(optionsFrame,font = "Helvetica 11 bold italic")
 combo['values'] = ["Level 1 (1-3)","Level 2 (1-6)","Level 3 (1-9)","Level 4 (1-12)"] # Level options
 combo.current(0) # Set the selected item to level 1
-combo.grid(row=3, column = 1)
+combo.grid(row=3, column = 1,sticky = "ew",pady=5)
+
+maxNumLabel = Label(optionsFrame, text="# Of Questions :",font = "Helvetica 11 bold italic", fg="#009A4E")
+maxNumLabel.grid(column=0,row=4,sticky = "ew",pady=10,padx=5 )
+maxNumSelection = Entry(optionsFrame)
+maxNumSelection.grid(row=4,column=1,padx=5,pady=10)
 
 # Button to submit game options
-submitOptionsBtn = tk.Button(optionsFrame,text="Start Game",fg='white',command=checkInput)
-submitOptionsBtn.config(bg="green")
+submitOptionsBtn = tk.Button(optionsFrame,text="Start Game",font = "Helvetica 12 bold italic",fg='white',command=checkInput)
+submitOptionsBtn.config(bg="#009A4E")
 submitOptionsBtn.grid(row=5,column=0,columnspan=2, sticky='ew',pady=10,padx=10)
 
 # Button to reset game
-resetBtn = tk.Button(optionsFrame,text="Reset Game",fg='red',command=resetValue)
-resetBtn.config(bg="yellow")
+resetBtn = tk.Button(optionsFrame,text="Reset Game",font = "Helvetica 12 bold italic",fg='red',command=resetValue)
+resetBtn.config(bg="#F7d31d")
 resetBtn.grid(row=6,column=0,columnspan=2,sticky='ew',pady=10,padx=10)
 
 # System Message Log widget to display game messages
-systemLog = tk.Label(optionsFrame,text="(System Log Messages)")
+systemLog = tk.Label(optionsFrame,text="(System Log Messages)",font = "Helvetica 9 bold italic")
 systemLog.grid(row=7,column=0, columnspan=2, sticky='ew',padx=10,pady=10)
 
 # Widget to display past question attempted by user
-pastQuestion = tk.Label(optionsFrame,text="")
+pastQuestion = tk.Label(optionsFrame,text="",font = "Helvetica 11 bold italic")
 pastQuestion.grid(row=8,column=0, columnspan=2, sticky='ew',padx=10,pady=10)
 
 #Frame 1 Components
@@ -270,18 +308,18 @@ consoleFrame = tk.Frame(frame1) # Console frame to show question and accept answ
 consoleFrame.config(bg="red")
 consoleFrame.grid(row=1, column=1,padx=10,pady=10)
 
-# Mario Jumping picture
-img1 = PhotoImage(file='marioJump.png')
-lbl1 = Label( frame1, image = img1)
+# Ferrari Logo
+img1 = PhotoImage(file='ferrariLogo.png')
+lbl1 = Label( frame1, image = img1,borderwidth=0, highlightthickness=0)
 lbl1.grid(row=0, column=1,sticky="w",padx=5,pady=5)
 
-# Luigi Jumping picture
-img2 = PhotoImage(file='luigiJump.png')
-lbl2 = Label( frame1, image = img2)
+# Ferrari Car
+img2 = PhotoImage(file='ferrariCar.png')
+lbl2 = Label( frame1, image = img2,borderwidth=0, highlightthickness=0)
 lbl2.grid(row=0, column=1,sticky="e",padx=5,pady=5)
 
 # Display expression for user to attempt
-questionDisplay = Label(consoleFrame,text="") # Set intial text to ""
+questionDisplay = Label(consoleFrame,text="",bg="#F7d31d",font = "Helvetica 11 bold italic") # Set intial text to ""
 questionDisplay.grid(row=1,column=1,padx=10,pady=10)
 
 # Accept user input to displayed expression
@@ -289,7 +327,7 @@ questionInput = Entry(consoleFrame)
 questionInput.grid(row=1,column=2,padx=5,pady=10)
 
 # Button to validate user input and check it
-checkAnswerBtn = tk.Button(consoleFrame,text="Check Answer",fg='white',command=checkAnswer)
+checkAnswerBtn = tk.Button(consoleFrame,text="Check Answer",font = "Helvetica 11 bold italic",fg='white',command=checkAnswer)
 checkAnswerBtn.config(bg="green")
 checkAnswerBtn.grid(row=2,column=1,padx=5,pady=5,sticky="ew",columnspan=2)
 
@@ -299,27 +337,27 @@ countFrame.config(bg="red")
 countFrame.grid(row=2, column=1,padx=10,pady=10)
 
 # Label for correct attempts game counter
-numCorrect_label = Label(countFrame, text="Correct Attempts")
+numCorrect_label = Label(countFrame, text="Correct Attempts",font = "Helvetica 10 bold italic",bg="#F7d31d")
 numCorrect_label.grid(row=2,column=1,padx=5,pady=5)
 
 # Label for wrong attempts game counter
-numWrong_label = Label(countFrame, text="Wrong Attempts")
+numWrong_label = Label(countFrame, text="Wrong Attempts",font = "Helvetica 10 bold italic",bg="#F7d31d")
 numWrong_label.grid(row=2,column=2,padx=5,pady=5)
 
 # Label for total attempts game counter
-numLeft_label = Label(countFrame, text="Total Attempts")
+numLeft_label = Label(countFrame, text="Total Attempts",font = "Helvetica 10 bold italic",bg="#F7d31d")
 numLeft_label.grid(row=2,column=3,padx=5,pady=5)
 
 # Value display for correct attempts game counter
-numCorrect_value = Label(countFrame, text="")
+numCorrect_value = Label(countFrame, text="",font = "Helvetica 10 bold italic")
 numCorrect_value.grid(row=1,column=1,padx=5,pady=5)
 
 # Value display for wrong attempts game counter
-numWrong_value = Label(countFrame, text="")
+numWrong_value = Label(countFrame, text="",font = "Helvetica 10 bold italic")
 numWrong_value.grid(row=1,column=2,padx=5,pady=5)
 
 # Value display for total attempts game counter
-numTotal_value = Label(countFrame, text="")
+numTotal_value = Label(countFrame, text="",font = "Helvetica 10 bold italic")
 numTotal_value.grid(row=1,column=3,padx=5,pady=5)
 
 # To run app
