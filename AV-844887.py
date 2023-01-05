@@ -1,10 +1,9 @@
 '''
 Name : Anirudh Bharadwaj Vangara 844887
 
-Program Title : Mario Math Time
+Program Title : Ferrari Flash - Math Game
 
-Program Description : A math flash cards game to help students practice math
-                      with Mario and Luigi!
+Program Description : A Ferrari themed math flash cards game to help students practice math!
 '''
 # Import Libraries
 import tkinter as tk
@@ -51,7 +50,7 @@ def checkInput():
             elif levelSelection == "Level 4 (1-12)":
                 questionDisplay.config(bg="red",fg="white") # Change frame background
                 maxNum = 12 # Reassign maximum number value     
-            systemLog.config(text="Game has started!") # Reset System Log to start
+            systemLog.config(text="Game has started! Vroom Vroom!") # Reset System Log to start
             pastQuestion.config(text="")
             # Reset All Game Counter Values
             totalCount = 0
@@ -148,6 +147,7 @@ def resetValue():
 
         percentStr = f"You scored a {score}%"
         pastQuestion.config(text=percentStr)
+        gameOver = False
     else:
         systemLog.config(text="Game has been reset")
         pastQuestion.config(text="")
@@ -237,7 +237,7 @@ totalCount = 0 # Number of total attempts
 
 # Create Tkinter Window
 window = tk.Tk()
-window.title("Ferrari Flash™ - Math Game")
+window.title("Ferrari Flash - Math Game")
 # window.geometry("645x290")
 
 # Define 2 sides of app
@@ -252,7 +252,7 @@ frame2.grid(row=0, column=1,sticky="ns")
 # Frame 2 Components
 
 # App heading
-appLabel = tk.Label(frame2, text="Ferrari Flash™ - Math Game",font = "Helvetica 16 bold italic", fg = "white",
+appLabel = tk.Label(frame2, text="Ferrari Flash - Math Game",font = "Helvetica 16 bold italic", fg = "white",
 		 bg = "red",)
 appLabel.grid(column=0, row=0, padx=6, pady=6)
 
