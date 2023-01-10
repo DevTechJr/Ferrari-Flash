@@ -167,7 +167,7 @@ def resetValue():
     else:
         # Reset Progress Bar
         gameProgress["value"] = 0
-        systemLog.config(text="Game has been reset. Press 'Start Game' to try!")
+        systemLog.config(text="Game has been reset. Press 'Start Game' to try again!")
         # Reset past question
         pastQuestion.config(text="")
 
