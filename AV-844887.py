@@ -4,12 +4,21 @@ Name : Anirudh Bharadwaj Vangara 844887
 Program Title : Ferrari Flash - Math Game
 
 Program Description : A Ferrari themed math flash cards game to help students practice math!
+
+Extra Enhancements : 
+- Question display background change (based on level difficulty)
+- Past question displayed (under System Log Messages)
+- Number of questions selections
+- Negative numbers
+- Modulus operator
+- Error log for all past questions
 '''
 # Import Libraries
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 import random
+from tkinter import scrolledtext
 
 #Define Functions
 
@@ -60,11 +69,15 @@ def checkInput():
             numCorrect_value.config(text=correctCount)
             numTotal_value.config(text=totalCount)
             numWrong_value.config(text=wrongCount)
-            # Game has started message
+            # Reset Progress Bar
+            gameProgress["value"] = 0
             gen_question() # Invoke gen_question function to initially start
         except:
             systemLog.config(text="Improper input! Enter an integer for number of questions!")
 
+# gen_question function
+# Inputs : None
+# Results : None
 def gen_question():
     # Import Global Variables
     global boolModulus
@@ -102,6 +115,9 @@ def gen_question():
     # Generate answer and assign it to variable
     answer = float(eval(f"{num1} {operator} {num2}"))
 
+# resetValue function
+# Inputs : None
+# Results : None
 def resetValue():
     # Import Global Variables
     global correctCount
@@ -149,13 +165,15 @@ def resetValue():
         pastQuestion.config(text=percentStr)
         gameOver = False
     else:
-        systemLog.config(text="Game has been reset")
-        pastQuestion.config(text="")
+        # Reset Progress Bar
+        gameProgress["value"] = 0
+        systemLog.config(text="Game has been reset. Press 'Start Game' to try!")
         # Reset past question
-    
+        pastQuestion.config(text="")
 
-    
-
+# updateScore function
+# Inputs : None
+# Results : None
 def updateScore():
     # Import Global Variables
     global correctCount
@@ -167,6 +185,9 @@ def updateScore():
     numTotal_value.config(text=totalCount)
     numWrong_value.config(text=wrongCount)
 
+# checkAnswer function
+# Inputs : None
+# Results : None
 def checkAnswer():
     # Import Global Variables
     global correctCount
@@ -176,6 +197,7 @@ def checkAnswer():
     global numOfQuestions
     global systemLog
     global gameOver
+    global errorLogWidget
 
     # Try to get user given answer
     try:
@@ -194,8 +216,9 @@ def checkAnswer():
 
         # Update score and display question as past question
         updateScore()
-        pastQuestionMessage = f"Past Question :   {expression} = {questionInput.get()} (Correct Answer)"
+        pastQuestionMessage = f"Past Question :   {expression} = {questionInput.get()} (Correct!)"
         pastQuestion.config(text=pastQuestionMessage)
+        updateProgressbar()
     else:
         # Update counters
         wrongCount+=1
@@ -205,6 +228,10 @@ def checkAnswer():
         updateScore()
         pastQuestionMessage = f"Past Question :   {expression} = {questionInput.get()} (Correct Answer = {answer})"
         pastQuestion.config(text=pastQuestionMessage)
+        errorLogWidget.configure(state ='normal')
+        errorLogWidget.insert(tk.INSERT,f"""\n{pastQuestionMessage}\n""")
+        errorLogWidget.configure(state ='disabled')
+        updateProgressbar()
     
     # Empty questionInput entry
     questionInput.delete(0, 'end')
@@ -216,6 +243,14 @@ def checkAnswer():
         systemLog.config(text="Game is over! Play again!")
         gameOver = True
         resetValue()
+
+# updateProgressbar function
+# Inputs : None
+# Results : None
+def updateProgressbar():
+    global numOfQuestions
+    step = 100/numOfQuestions
+    gameProgress["value"] += step
 
 # Define global variables
 num1 = 0 # Random number 1
@@ -240,16 +275,44 @@ window = tk.Tk()
 window.title("Ferrari Flash - Math Game")
 # window.geometry("645x290")
 
+# Game Notebook (for tabs)
+notebook = ttk.Notebook(window)
+notebook.grid(row=0,column=0)
+
+# Game Container
+gameContainer = tk.Frame(notebook)
+gameContainer.grid(row=0,column=0)
+
+# Error Log
+errorLogContainer = tk.Frame(notebook)
+errorLogContainer.grid(row=0,column=0)
+
+# Design Error Log Container
+errorLogTitle = Label(errorLogContainer,text="Past Questions Error Log",font = "Helvetica 16 bold italic", fg = "red",
+		 )
+errorLogTitle.grid(row=0,column=0)
+
+errorLogWidget = scrolledtext.ScrolledText(errorLogContainer, wrap = tk.WORD, width = 80, height = 10,font = "Helvetica 12 bold italic")
+
+errorLogWidget.insert(tk.INSERT,
+"""
+""")
+errorLogWidget.configure(state ='disabled')
+errorLogWidget.grid(column = 0,row=1, pady = 10, padx = 10)
+
+# Adding Tabs to notebook
+notebook.add(gameContainer, text="Gameplay")
+notebook.add(errorLogContainer,text="Error Log")
+
 # Define 2 sides of app
-frame1 = tk.Frame(window) # App left side
+frame1 = tk.Frame(gameContainer) # App left side
 frame1.config(bg="#5F2423")
 frame1.grid(row=0, column=0,sticky="ns")
 
-frame2 = tk.Frame(window) # App right side
+# Frame 2 Components
+frame2 = tk.Frame(gameContainer) # App right side
 frame2.config(bg="red")
 frame2.grid(row=0, column=1,sticky="ns")
-
-# Frame 2 Components
 
 # App heading
 appLabel = tk.Label(frame2, text="Ferrari Flash - Math Game",font = "Helvetica 16 bold italic", fg = "white",
@@ -359,6 +422,14 @@ numWrong_value.grid(row=1,column=2,padx=5,pady=5)
 # Value display for total attempts game counter
 numTotal_value = Label(countFrame, text="",font = "Helvetica 10 bold italic")
 numTotal_value.grid(row=1,column=3,padx=5,pady=5)
+
+# Progress Bar Frame
+progressFrame = tk.Frame(frame1) # Console frame to show question and accept answer
+progressFrame.config(bg="red")
+progressFrame.grid(row=3, column=1,padx=10,pady=10)
+
+gameProgress = ttk.Progressbar(progressFrame, orient=HORIZONTAL, length=300,mode='determinate')
+gameProgress.grid(row=1,column=1, padx=5,pady=5)
 
 # To run app
 tk.mainloop()
