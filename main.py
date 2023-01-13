@@ -7,11 +7,14 @@ Program Description : A Ferrari themed math flash cards game to help students pr
 
 Extra Enhancements : 
 - Question display background change (based on level difficulty)
-- Past question displayed (under System Log Messages)
+- Past question displayed under (System Log Messages)
 - Number of questions selections
 - Negative numbers
 - Modulus operator
+- Division operator
 - Error log for all past questions
+- Quit game button
+- Tab navigation with notebook widget
 '''
 # Import Libraries
 import tkinter as tk
