@@ -110,6 +110,9 @@ def gen_question():
     # Least Number = 1
     leastNum = 1
 
+  if leastNum == 0:
+    leastNum = 1
+
   # Generate random numbers and assign them to variables
   num1 = random.randint(leastNum, maxNum)
   num2 = random.randint(leastNum, maxNum)
@@ -119,6 +122,8 @@ def gen_question():
 
   # Generate expression, assign it to variable and display it
   if operator == "%":
+    num1 = abs(num1)
+    num2 = abs(num2)
     if num1 >= num2:
       largerNum = num1
       smallerNum = num2
@@ -192,7 +197,8 @@ def resetValue():
       highScore = score
       messagebox.showinfo(
         "New High Score Achieved!",
-        f"Congrats! You have a new high score of {highScore}!")
+        f"Congrats! Yaou have a new high score of {highScore}%!")
+      highScoreLabel.config(text=f"Your High Score : {highScore}%")
   else:
     # Reset Progress Bar
     gameProgress["value"] = 0
@@ -285,6 +291,24 @@ def updateProgressbar():
   step = 100 / numOfQuestions
   gameProgress["value"] += step
 
+# quitGame function
+# Inputs : None
+# Results : None
+def quitGame():
+  messagebox.showerror("Closing Game", "Thanks for playing! See you again, racer!")
+  window.destroy()
+
+# backToGame function
+# Inputs : None
+# Results : None
+def backToGame():
+  notebook.select(0)
+
+# backToErrorLog function
+# Inputs : None
+# Results : None
+def backToErrorLog():
+  notebook.select(1)
 
 # Define global variables
 num1 = 0  # Random number 1
@@ -310,8 +334,12 @@ window = tk.Tk()
 window.title("Ferrari Flash - Math Game")
 # window.geometry("645x290")
 
+style = ttk.Style()
+
+style.layout('Tabless.TNotebook.Tab', []) # new style with tabs turned off
+
 # Game Notebook (for tabs)
-notebook = ttk.Notebook(window)
+notebook = ttk.Notebook(window, style='Tabless.TNotebook')
 notebook.grid(row=0, column=0)
 
 # Game Container
@@ -321,34 +349,71 @@ gameContainer.grid(row=0, column=0)
 # Error Log
 errorLogContainer = tk.Frame(notebook)
 errorLogContainer.grid(row=0, column=0)
+errorLogContainer.config(bg="#5F2423")
 
 # Design Error Log Container
 errorLogTitle = Label(
   errorLogContainer,
-  text="Past Questions Error Log",
+  text="Past Errors Log",
   font="Helvetica 16 bold italic",
-  fg="red",
+  bg="red",fg="white"
 )
-errorLogTitle.grid(row=0, column=0)
+errorLogTitle.grid(row=0, column=1)
 
 highScoreLabel = Label(
   errorLogContainer,
   text=f"High Score : {highScore}",
   font="Helvetica 12 bold italic",
-  fg="green",
+  bg="green",fg="white"
 )
-highScoreLabel.grid(row=1, column=0)
+highScoreLabel.grid(row=1, column=1)
 
 errorLogWidget = scrolledtext.ScrolledText(errorLogContainer,
                                            wrap=tk.WORD,
-                                           width=80,
+                                           width=55,
                                            height=10,
                                            font="Helvetica 12 bold italic")
 
 errorLogWidget.insert(tk.INSERT, """
 """)
 errorLogWidget.configure(state='disabled')
-errorLogWidget.grid(column=0, row=2, pady=10, padx=10)
+errorLogWidget.grid(column=1, row=2, pady=10, padx=10)
+
+# Images Added on Sides
+# Ferrari Logo
+img1 = PhotoImage(file='ferrariLogo.png')
+lbl1_errorlog = Label(errorLogContainer, image=img1, borderwidth=0, highlightthickness=0)
+lbl1_errorlog.grid(row=2, column=0,sticky="w",padx=5)
+
+# Ferrari Car
+img2 = PhotoImage(file='ferrariCar.png')
+lbl2_errorlog = Label(errorLogContainer, image=img2, borderwidth=0, highlightthickness=0)
+lbl2_errorlog.grid(row=2, column=2,sticky="e",padx=5)
+
+# App Favicon
+window.iconphoto(False, img1)
+
+quitBtn = tk.Button(errorLogContainer,
+                             text="Quit Game",
+                             font="Helvetica 12 bold italic",
+                             fg='white',
+                             command=quitGame)
+quitBtn.config(bg="#009A4E")
+quitBtn.grid(row=4,
+                      column=1,
+                      columnspan=1,
+                      sticky='ew',
+                      pady=10,
+                      padx=10)
+
+# Button to reset game
+backBtn = tk.Button(errorLogContainer,
+                     text="Go Back To Game",
+                     font="Helvetica 12 bold italic",
+                     fg='red',
+                     command=backToGame)
+backBtn.config(bg="#F7d31d")
+backBtn.grid(row=3, column=1, columnspan=1, sticky='ew', pady=10, padx=10)
 
 # Adding Tabs to notebook
 notebook.add(gameContainer, text="Gameplay")
@@ -440,7 +505,16 @@ resetBtn = tk.Button(optionsFrame,
                      fg='red',
                      command=resetValue)
 resetBtn.config(bg="#F7d31d")
-resetBtn.grid(row=6, column=0, columnspan=2, sticky='ew', pady=10, padx=10)
+resetBtn.grid(row=6, column=0, columnspan=1, sticky='ew', pady=10, padx=10)
+
+# Button to visit Error Log
+errorLogBtn = tk.Button(optionsFrame,
+                     text="View Error Log",
+                     font="Helvetica 12 bold italic",
+                     fg='white',
+                     command=backToErrorLog)
+errorLogBtn.config(bg="#5F2423")
+errorLogBtn.grid(row=6, column=1, columnspan=1, sticky='ew', pady=10, padx=10)
 
 # System Message Log widget to display game messages
 systemLog = tk.Label(optionsFrame,
@@ -459,12 +533,10 @@ consoleFrame.config(bg="red")
 consoleFrame.grid(row=1, column=1, padx=10, pady=10)
 
 # Ferrari Logo
-img1 = PhotoImage(file='ferrariLogo.png')
 lbl1 = Label(frame1, image=img1, borderwidth=0, highlightthickness=0)
 lbl1.grid(row=0, column=1, sticky="w", padx=5, pady=5)
 
 # Ferrari Car
-img2 = PhotoImage(file='ferrariCar.png')
 lbl2 = Label(frame1, image=img2, borderwidth=0, highlightthickness=0)
 lbl2.grid(row=0, column=1, sticky="e", padx=5, pady=5)
 
@@ -538,4 +610,7 @@ gameProgress = ttk.Progressbar(progressFrame,
 gameProgress.grid(row=1, column=1, padx=5, pady=5)
 
 # To run app
+messagebox.showinfo("Welcome To Ferrari Flash!", 'Welcome racer! \
+To begin playing, please select game options and a level. \
+Press "Start Game" to begin gameplay with selected options!')
 tk.mainloop()
