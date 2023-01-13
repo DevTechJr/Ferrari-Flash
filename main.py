@@ -125,24 +125,35 @@ def gen_question():
 
   # Generate expression, assign it to variable and display it
   if operator == "%":
+
+    # Assuming user selects negative numbers too, absolute them for positive value
     num1 = abs(num1)
     num2 = abs(num2)
+
+    # Define larger / smaller numbers
     if num1 >= num2:
       largerNum = num1
       smallerNum = num2
     else:
       largerNum = num2
       smallerNum = num1
+    
+    # Create expression with larger / smaller numbers
     expression = f"{largerNum} {operator} {smallerNum}"
+  
+  # Incase of Division operator
   elif operator == "/":
+    # Calculate product first
     resultSample = num1 * num2
     expression = f"{resultSample} {operator} {num1}"
   else:
+    # All other clauses (addition, subtraction & multiplication)
     expression = f"{num1} {operator} {num2}"
 
+  # Display question in game to questionDisplay widget
   questionDisplay.config(text=expression)
 
-  # Generate answer and assign it to variable
+  # Generate answer and assign it to global variable
   answer = float(eval(expression))
 
 
@@ -205,6 +216,7 @@ def resetValue():
   else:
     # Reset Progress Bar
     gameProgress["value"] = 0
+    messagebox.showwarning("Game Has Been Reset. To play again, press 'Start Game'.")
     systemLog.config(
       text="Game has been reset. Press 'Start Game' to try again!")
     # Reset past question
@@ -305,18 +317,20 @@ def quitGame():
 # Inputs : None
 # Results : None
 def backToGame():
+  # Go back to gameplay tab
   notebook.select(0)
 
 # backToErrorLog function
 # Inputs : None
 # Results : None
 def backToErrorLog():
+  # Go back to error log
   notebook.select(1)
 
 # Define global variables
 num1 = 0  # Random number 1
 num2 = 0  # Random number 2
-operators = ["*", "+", "-", "/"]  # Initial operators
+operators = ["*", "+", "-", "/"]  # Initial operators (with division)
 expression = ""  # Expression string
 answer = ""  # Answer to expression
 
