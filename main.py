@@ -113,12 +113,14 @@ def gen_question():
     # Least Number = 1
     leastNum = 1
 
-  if leastNum == 0:
-    leastNum = 1
 
   # Generate random numbers and assign them to variables
   num1 = random.randint(leastNum, maxNum)
   num2 = random.randint(leastNum, maxNum)
+
+  if num1 == 0 or num2 == 0:
+    num1 = 1
+    num2 = 1
 
   # Generate random operator and assign it to variable
   operator = random.choice(operators)
@@ -211,12 +213,12 @@ def resetValue():
       highScore = score
       messagebox.showinfo(
         "New High Score Achieved!",
-        f"Congrats! Yaou have a new high score of {highScore}%!")
+        f"Congrats! You have a new high score of {highScore}%!")
       highScoreLabel.config(text=f"Your High Score : {highScore}%")
   else:
     # Reset Progress Bar
     gameProgress["value"] = 0
-    messagebox.showwarning("Game Has Been Reset. To play again, press 'Start Game'.")
+    messagebox.showwarning("Game Has Been Reset.","To play again, press 'Start Game'.")
     systemLog.config(
       text="Game has been reset. Press 'Start Game' to try again!")
     # Reset past question
@@ -270,7 +272,7 @@ def checkAnswer():
     # Update score and display question as past question
     updateScore()
     pastQuestionMessage = f"Past Question :   {expression} = {questionInput.get()} (Correct!)"
-    pastQuestion.config(text=pastQuestionMessage)
+    pastQuestion.config(text=pastQuestionMessage, fg="green")
     updateProgressbar()
   else:
     # Update counters
@@ -280,7 +282,7 @@ def checkAnswer():
     # Update score and display question as past question
     updateScore()
     pastQuestionMessage = f"Past Question :   {expression} = {questionInput.get()} (Correct Answer = {answer})"
-    pastQuestion.config(text=pastQuestionMessage)
+    pastQuestion.config(text=pastQuestionMessage, fg="red")
     errorLogWidget.configure(state='normal')
     errorLogWidget.insert(tk.INSERT, f"""\n{pastQuestionMessage}\n""")
     errorLogWidget.configure(state='disabled')
